@@ -45,8 +45,7 @@ class Output
   end
 
   def lists(components)
-    puts 'listing'
-    # puts all @installed_components
+    puts @installed_components
   end
 
   private
