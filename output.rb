@@ -9,7 +9,7 @@ class Output
 
   def process(command, components)
     if command == 'DEPEND' then depends(components)
-    elsif command == 'INSTALL' then installs(command, components)
+    elsif command == 'INSTALL' then installs(components)
     elsif command == 'REMOVE' then removes(components)
     elsif command == 'LIST' then lists(components)
     else
@@ -25,11 +25,11 @@ class Output
     @dependent_hash.merge!(new_hash)
   end
 
-  def installs(command, component)
-    if @installed_components.include? component
-      puts ' ' + component + ' is already installed.'
+  def installs(component)
+    if @installed_components.include? component[0].to_s
+      puts ' ' + component[0].to_s + ' is already installed.'
     elsif @dependent_hash.key?(component[0])
-      with_dependencies('add', component)
+      add_with_dependencies(component)
     else
       @installed_components << component[0]
       puts ' Installing ' + component[0].to_s
@@ -70,16 +70,16 @@ class Output
     components_array
   end
 
-  def with_dependencies(operation, component)
+  def add_with_dependencies(component)
     @installed_components << component[0]
     puts ' Installing ' + component[0].to_s
-    if operation == 'add'
-      @dependent_hash[component[0]].each do |x|
+    @dependent_hash[component[0]].each do |x|
+      if @installed_components.include? x
+        puts ' ' + x + ' is already installed.'
+      else
         @installed_components << x
         puts ' Installing ' + x
       end
-    else
-      puts 'we are removing'
     end
   end
 
