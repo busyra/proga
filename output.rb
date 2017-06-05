@@ -36,12 +36,20 @@ class Output
     end
   end
 
-  def removes(components)
-    puts 'removing'
-    # checks if components already installed_components
+  def removes(component)
+    if !@installed_components.include? component[0]
+      puts ' ' + component[0] + ' is not installed'
+    elsif @dependent_hash.key?(component[0])
+      remove_with_dependencies(component)
     # checks if components is val to any other component key in @dependents_hash
     # checks if component key is in @installed_components
     # removes from component from @installed_components
+    elsif !dependent_to_installed(component[0])
+      @installed_components.delete(component[0])
+      puts ' Removing ' + component[0]
+    else
+      puts ' Can not remove ' + component[0]
+    end
   end
 
   def lists(components)
@@ -80,6 +88,22 @@ class Output
         puts ' Installing ' + x
       end
     end
+  end
+
+  def remove_with_dependencies(component)
+    @installed_components.delete(component[0])
+    puts ' Removing!! ' + component[0].to_s
+    @dependent_hash[component[0]].each do |x|
+      if !dependent_to_installed(x)
+        @installed_components.delete(x)
+        puts ' REMOVING!!!!!! ' + x
+      end
+    end
+  end
+
+  def dependent_to_installed(component)
+    # check for if component is value in the dependent_hash
+    # and key is currently in @installed_components
   end
 
   def end_prog; end
