@@ -8,7 +8,7 @@ class Output
   end
 
   def process(command, components)
-    if command == 'DEPEND' then depends(command, components)
+    if command == 'DEPEND' then depends(components)
     elsif command == 'INSTALL' then installs(command, components)
     elsif command == 'REMOVE' then removes(components)
     elsif command == 'LIST' then lists(components)
@@ -17,17 +17,23 @@ class Output
     end
   end
 
-  def depends(command, components)
-    puts 'depending' + components.to_s
-    binding.pry
-    # add to @dependents_hash
+  def depends(components)
+    main_component = components.shift
+    dependencies = components
+    new_hash = {}
+    new_hash[main_component] = dependencies
+    @dependent_hash.merge!(new_hash)
   end
 
-  def installs(command, components)
-    puts 'installing'
-    # check if components already installed
-    # add components to @installed_components
-    # puts output message " Installing " + component
+  def installs(command, component)
+    if @installed_components.include? component
+      puts ' ' + component + ' is already installed.'
+    elsif @dependent_hash.key?(component[0])
+      with_dependencies('add', component)
+    else
+      @installed_components << component[0]
+      puts ' Installing ' + component[0].to_s
+    end
   end
 
   def removes(components)
@@ -62,6 +68,19 @@ class Output
     components_array = line.split
     components_array.shift
     components_array
+  end
+
+  def with_dependencies(operation, component)
+    @installed_components << component[0]
+    puts ' Installing ' + component[0].to_s
+    if operation == 'add'
+      @dependent_hash[component[0]].each do |x|
+        @installed_components << x
+        puts ' Installing ' + x
+      end
+    else
+      puts 'we are removing'
+    end
   end
 
   def end_prog; end
